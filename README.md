@@ -485,6 +485,21 @@ Instalando:
 npm install --save form-serialize
 ```
 
+# Testes
+
+https://github.com/facebookincubator/create-react-app/blob/master/packages/react-scripts/template/README.md#running-tests
+
+utilize o enzyme para facilitar nossos testes
+
+
+```javascript
+npm install --save enzyme react-test-renderer
+```
+
+Alterar o package.json para configurar o jest: 
+
+
+
 
 # Utils #
 
