@@ -353,6 +353,21 @@ Verificação dos tipos de props de um componente com PropTypes
 npm install --save prop-types
 ```
 
+
+## Ex utilização em classes: 
+
+```javascript
+class ListContacts extends Component {
+
+    static propTypes = {
+        contacts: PropTypes.array.isRequired,
+        onDeleteContact: PropTypes.func.isRequired
+    };
+
+}
+```
+
+
 # Lifecycle Events #
 
 > <span style="color:red;font-size:2em">render()</span> é para renderizar, apenas!
@@ -491,10 +506,42 @@ https://github.com/facebookincubator/create-react-app/blob/master/packages/react
 
 utilize o enzyme para facilitar nossos testes
 
+Comando para iniciar com um setup: 
+
+```
+// no package.json adicionar "test": "react-scripts test --env=jsdom ",
+
+//o  comando: --setupFiles='./src/__setups__/setupTest.js'",
+
+// setupTest.js
+
+import { configure } from 'enzyme';
+import Adapter from 'enzyme-adapter-react-16';
+
+configure({ adapter: new Adapter()});
+
+const localStorageMock = {
+    getItem: jest.fn(),
+    setItem: jest.fn(),
+    clear: jest.fn()
+};
+global.localStorage = localStorageMock
+
+global.requestAnimationFrame = global.window.requestAnimationFrame || function(fn) {
+    return setTimeout(fn, 0)
+}
+
+```
 
 ```javascript
 npm install --save enzyme react-test-renderer
+
+npm i --save-dev enzyme enzyme-adapter-react-16
+
+npm install --save-dev enzyme-to-json
 ```
+
+https://www.npmjs.com/package/enzyme-to-json
 
 Alterar o package.json para configurar o jest: 
 
