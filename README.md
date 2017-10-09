@@ -545,9 +545,6 @@ https://www.npmjs.com/package/enzyme-to-json
 
 Alterar o package.json para configurar o jest: 
 
-
-
-
 # Utils #
 
 Extenssão do Chrome: 
@@ -557,3 +554,262 @@ Extenssão do Chrome:
 2. Pacote para scape-string https://www.npmjs.com/package/escape-string-regexp
 
 3. Pacote para ordenar https://www.npmjs.com/package/sort-by
+
+4. recompose
+
+5. react-google-maps
+
+5. redux-logger https://www.npmjs.com/package/redux-logger
+    
+    Middleware para fazer log de uma transação redux
+
+6. redux-thunk https://github.com/gaearon/redux-thunk
+
+    Middleware para trabalhar com assincronidade em uma aplicação com Redux
+
+## O pacote npm redux-logger ##
+
+O pacote redux-logger já vem configurado com opções padrão, mas, fique à vontade para adicionar outras personalizações, se necessário!
+
+
+# Redux #
+
+
+Redux é uma biblioteca de JavaScript usada para gerenciar o estado do front-end de um aplicativo. Ele não é obrigatório em aplicativos de React, porém, conforme web apps se tornam mais complexos, podem surgir bugs devido ao gerenciamento incorreto de estados. O estado global dos aplicativos Redux é mantido em uma single source of truth: a Redux Store. Como as alterações de estado são bem controladas, isso torna o Redux bastante previsível. Na verdade, um das principais motivos pelos quais os desenvolvedores adoram Redux é sua previsibilidade. Vamos ver por quê!
+
+![alt redux basic](./nd019-c2-redux-full.png)
+
+Este é o gráfico que acabamos de ver. Como você pode ver, existem três partes principais no Redux:
+
+actions  
+reducers  
+store  
+A maior parte dos dados ou estado do aplicativo vive na store. Os dados da store são preenchidos por reducers (é possível ter mais de um reducer, mas estamos apenas mostrando um na imagem). Uma action é “despachada” pela store, e é o que é usada pelos reducers para determinar quais dados eles devem produzir. Para ser mais claro, pode (e vai!) haver mais de uma única action em um aplicativo Redux.  
+
+
+
+![alt redux basic](./nd019-c2-reduxflowgraphic-diagram.png)
+
+
+## Actions ##
+
+>💡 Recomendações para actions 💡  
+>Algumas coisas para se ter em mente conforme você constrói objetos de action:  
+>  
+>Prefira constantes a strings como os valores de propriedades type. Ambos funcionam -- mas quando usamos constantes, o console lançará um erro em vez de falhar silenciosamente, caso haja algum   
+>erro de grafia (por exemplo: LAOD_PROFILE em vez de LOAD_PROFILE).  
+>Mantenha os dados transmitidos do menor tamanho possível. Faça com que seus recursos enviem apenas os dados necessários!  
+
+
+```javascript
+
+const initialCalendarState = {
+  sunday: {
+    breakfast: null,
+    lunch: null,
+    dinner: null
+  },
+  monday: {
+    breakfast: null,
+    lunch: null,
+    dinner: null
+  },
+  tuesday: {
+    breakfast: null,
+    lunch: null,
+    dinner: null
+  },
+  wednesday: {
+    breakfast: null,
+    lunch: null,
+    dinner: null
+  },
+  thursday: {
+    breakfast: null,
+    lunch: null,
+    dinner: null
+  },
+  friday: {
+    breakfast: null,
+    lunch: null,
+    dinner: null
+  },
+  saturday: {
+    breakfast: null,
+    lunch: null,
+    dinner: null
+  }
+};
+
+function c(){
+  let dia = 'sunday';
+  return {
+      // O ... adiciona o objeto anterior a esse novo objeto
+    ...initialCalendarState,
+    // os [] faz com que o dia especifico 'sunday' seja alterado dentro do objeto
+    [dia]: {
+     // adicionando todo o dia
+      ...initialCalendarState[dia],
+      // alterando somente 1 propriedade
+      breakfast: 'rodrigo'
+    }
+  }
+}
+
+console.log(c());
+
+```
+
+
+# Store #
+
+Para criar uma store, você passa uma função reducer como o primeiro argumento para o método createStore() do Redux. O que é retornado pelo createStore() é a próprio store. Essa store tem três propriedades:
+
+* getState()  
+* dispatch()  
+* subscribe()  
+
+
+## getState()  ##
+
+store.getState() não recebe nenhum argumento e retorna o estado atual da store.
+
+## dispatch() ## 
+store.dispatch(action) recebe um objeto da action e chama a função reducer, passando o estado atual e a action que foi despachada para ela. Por exemplo:
+
+
+```javascript
+// store.js
+
+import { createStore } from 'redux';
+import reducer from '../reducers/reducer';
+
+let store = createStore(reducer);
+
+const receiveComment = comment => ({
+  type: 'RECEIVE_COMMENT',
+  comment
+});
+
+export default store;
+
+```
+
+```javascript
+store.getState(); // []
+store.dispatch(receiveComment('Redux is great!'));
+store.getState(); // ['Redux is great!']
+```
+
+## subscribe() ##
+
+store.subscribe(cb) recebe uma função listener de callback que será invocada sempre que o estado da store for alterado.
+
+
+## 💡 O atributo ref 💡 ##
+
+>O código no vídeo anterior usou o atributo ref. O atributo ref é um atributo especial fornecido pelo React, que permite que você acesse o DOM. Para mais informações sobre o ref e quando/como voc    
+>deveria usá-lo, dê uma olhada na documentação de Ref e no DOM.
+
+# react-redux #
+
+A maior vantagem do react-redux é percebida no despacho de actions e no acesso à store do Redux a partir dos seus componentes React. Isso tudo é possível graças ao componente Provider do react-redux, e ao método connect().
+
+O connect() permite que você especifique quais componentes devem receber quais dados da store, e o Provider faz com que connect() funcione corretamente. Vamos nos aprofundar nesses dois elementos.
+
+
+Para configura-lo basta adicionar um component Provider ex:
+
+`import { Provider } from 'react-redux';`
+
+Adicionar no ReactDOM.render o componente Provider ex código completo: 
+
+
+```javascript
+import React from 'react';
+import ReactDOM from 'react-dom';
+import './index.css';
+import App from './components/App';
+import registerServiceWorker from './registerServiceWorker';
+import { createStore } from 'redux';
+import reducer from './reducers';
+import { Provider } from 'react-redux';
+
+const store = createStore(
+  reducer,
+  window.__REDUX_DEVTOOLS_EXTENSION__ && window.__REDUX_DEVTOOLS_EXTENSION__()
+);
+
+
+ReactDOM.render(
+  <Provider store={store}>
+    <App store={store} />
+  </Provider>
+  , document.getElementById('root'));
+registerServiceWorker();
+
+
+```
+# Reduce
+
+## Quiz
+
+```javascript
+/* Popular Ice Cream Totals Quiz
+ *
+ * Using the data array and .reduce():
+ *   - Return an object where each property is the name of an ice cream flavor
+ *     and each value is an integer that's the total count of that flavor
+ *   - Store the returned data in a new iceCreamTotals variable
+ *
+ * Notes:
+ *   - Do not delete the data variable
+ *   - Do not alter any of the data content
+ */
+
+ const data = [
+     { name: 'Tyler', favoriteIceCreams: ['Strawberry', 'Vanilla', 'Chocolate', 'Cookies & Cream'] },
+     { name: 'Richard', favoriteIceCreams: ['Cookies & Cream', 'Mint Chocolate Chip', 'Chocolate', 'Vanilla'] },
+     { name: 'Amanda', favoriteIceCreams: ['Chocolate', 'Rocky Road', 'Pistachio', 'Banana'] },
+     { name: 'Andrew', favoriteIceCreams: ['Vanilla', 'Chocolate', 'Mint Chocolate Chip'] },
+     { name: 'David', favoriteIceCreams: ['Vanilla', 'French Vanilla', 'Vanilla Bean', 'Strawberry'] },
+     { name: 'Karl', favoriteIceCreams: ['Strawberry', 'Chocolate', 'Mint Chocolate Chip'] }
+ ];
+
+
+
+let iceCreamTotals = data.reduce((accumulate, data) => {
+    
+    data.favoriteIceCreams.forEach(f => {
+        
+        if(accumulate[f]){
+            accumulate[f]++;
+        }else{
+            accumulate[f] = 1;
+        }
+        
+      });
+    
+    return accumulate
+    }, {});
+
+console.log(iceCreamTotals);
+```
+
+
+# Usando o connect # 
+
+connect() é uma função que permite que um componente obtenha dados e despache actions a partir de uma store do Redux. Sua assinatura é interessante. Usando todos os argumentos, ela fica assim:
+
+`connect(mapStateToProps, mapDispatchToProps)(MyComponent)`
+
+Para adiantar um pouco a explicação, MyComponent é o componente que você quer que receba dados da store, despache actions nela, ou ambos. mapStateToProps() é uma função que recebe a store atual e as props atuais, e o que ela retorna será disponível para MyComponent como propriedades. mapDispatchToProps() permite que você envolva action creators dentro do despacho. Vamos olhar para cada uma delas mais de perto!
+
+## mapStateToProps() ##
+
+mapStateToProps() permite que você especifique que dados do store você quer que sejam passados para seus componente React. Ele pega do state de store um argumento opcional ownprops, e retorna um objeto. Veja sua assinatura completa:
+
+`mapStateToProps(state, [ownProps])`
+
+
+
