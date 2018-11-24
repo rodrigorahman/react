@@ -812,4 +812,15 @@ mapStateToProps() permite que você especifique que dados do store você quer qu
 `mapStateToProps(state, [ownProps])`
 
 
+# click dentro de click
 
+Quando utilizamos um onClick dentro de outro onClick o html executa uma propagação invoca o primero onclick e depois o outros automaticamente. 
+
+Caso queira alterar esse comportamento basta utilizar 
+
+```
+onClick={(event) => { 
+    event.stopPropagation();
+  }
+})
+```
